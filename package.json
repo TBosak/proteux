@@ -22,6 +22,7 @@
         "@angular/router": "^16.0.0",
         "axios": "^1.4.0",
         "html-table-to-json": "^1.0.0",
+        "mat-table-exporter": "^15.0.0",
         "papaparse": "^5.4.1",
         "rxjs": "~7.8.0",
         "tslib": "^2.3.0",
