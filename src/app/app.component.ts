@@ -2,7 +2,7 @@ import { AfterViewChecked, Component, ElementRef, OnInit, QueryList, ViewChild, 
 import { FormControl, FormGroup } from '@angular/forms';
 import * as Papa from 'papaparse';
 import { MatTableExporterDirective } from 'mat-table-exporter';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatExpansionPanel } from '@angular/material/expansion';
 
