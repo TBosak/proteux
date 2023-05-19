@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class StripPipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
-    return value.replaceAll(args, '');
+    return value.type === 'string' ? value?.replaceAll(args, '') : value;
   }
 
 }

@@ -14,7 +14,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 
 export class AppComponent implements  OnInit, AfterViewChecked {
   title = 'app';
-  response = new MatTableDataSource<any>([{a:1, b:2, c:3}]);
+  response = new MatTableDataSource<any>([{}]);
   data: any = [];
   hiddenColumns: any[] = [];
   hidden: boolean = true;
@@ -41,7 +41,12 @@ export class AppComponent implements  OnInit, AfterViewChecked {
     const target= event.target as HTMLInputElement;
     const file: File = (target.files as FileList)[0];
     file.text().then((text) => {
-      this.data = Papa.parse(text, {header:true, skipEmptyLines: true}).data;
+      if(file.type.includes('csv')){
+        this.data = Papa.parse(text, {header:true, skipEmptyLines: true}).data;
+      }
+      if(file.type.includes('json')){
+        this.data = JSON.parse(text);
+      }
       const datasource = new MatTableDataSource<any>(this.data);
       datasource.paginator = this.paginator;
       this.response = datasource;
@@ -76,7 +81,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
     setTimeout(()=>this.matTableExporter.exportTable(type, opts), 500);
     }
 
-    hideColumn(event: any, index: any){
+    hideColumn(event: any, index: any, column: any){
       if(event.checked){
         this.hiddenColumns.push(index);
       }
