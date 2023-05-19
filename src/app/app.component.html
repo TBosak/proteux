@@ -3,33 +3,35 @@
   <mat-icon>attach_file</mat-icon>
   Upload File
 </button>
-<table mat-table matTableExporter [hidden]="hidden" #table [dataSource]="response" [hiddenColumns]="hiddenColumns">
+<table [style.width.%]="100" mat-table matTableExporter [hidden]="hidden" #table [dataSource]="response" [hiddenColumns]="hiddenColumns">
     <ng-container *ngFor="let disCol of keys(response.data[0]); let colIndex = index" matColumnDef="{{disCol}}">
         <th mat-header-cell *matHeaderCellDef>
             <mat-expansion-panel #panel [expanded]="false">
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
+                    <mat-panel-title [ngClass]="{'hidden' : hiddenColumns.includes(colIndex)}">
                         {{disCol | strip : '"' | titlecase}}
                     </mat-panel-title>
                 </mat-expansion-panel-header>
                 <ng-template matExpansionPanelContent>
-                    <mat-checkbox (change)="hideColumn($event, colIndex, disCol)">Hide from export</mat-checkbox>
-                    <br>
                     <mat-form-field [style.width.%]="100">
                         <mat-label>Filter</mat-label>
-                        <input matInput type="text" [formControl]="group[disCol]">
+                        <input matInput type="text" [formControl]="group[disCol]">&nbsp;
                     </mat-form-field>
+                    <br>
+                    <mat-checkbox (change)="hideColumn($event, colIndex, disCol)">Hide from export</mat-checkbox>
                 </ng-template>
             </mat-expansion-panel>
+            <button mat-icon-button class="shrink-2x" (click)="sort(disCol,'asc')"><mat-icon>arrow_upward</mat-icon></button>
+            <button mat-icon-button class="shrink-2x" (click)="sort(disCol,'desc')"><mat-icon>arrow_downward</mat-icon></button>
         </th>
         <td mat-cell [ngClass]="{'hidden' : hiddenColumns.includes(colIndex)}" *matCellDef="let element">{{element[disCol] | strip : '"'}}</td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="keys(response.data[0]); sticky:true"></tr>
     <tr mat-row *matRowDef="let row; columns: keys(response.data[0])"></tr>
 </table>
-<mat-paginator [hidden]="response.data.length < 6" [disabled]="response.data.length < 6" [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
+<mat-paginator [style.width.%]="100" [hidden]="response.data.length < 6" [disabled]="response.data.length < 6" [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
 </mat-paginator>
-<mat-grid-list *ngIf="!hidden" cols="4" rowHeight="4:1">
+<mat-grid-list [style.width.%]="100" *ngIf="!hidden" cols="4" rowHeight="4:1">
     <mat-grid-tile>
         <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('xlsx', {fileName:'test', sheet: 'sheet_name', Props: {Author: 'Talha'}})">Excel</button>
     </mat-grid-tile>

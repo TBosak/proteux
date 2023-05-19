@@ -90,4 +90,15 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       }
     }
 
+    sort(column: string, dir: string){
+      this.response.data = [...this.response.data].sort((a, b) => {
+        if(dir === 'asc'){
+          return a[column] > b[column] ? 1 : -1;
+        }
+        else{
+          return a[column] < b[column] ? 1 : -1;
+        }
+      });
+    }
+
 }
