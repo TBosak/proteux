@@ -15,19 +15,43 @@
                     </mat-panel-title>
                 </mat-expansion-panel-header>
                 <ng-template matExpansionPanelContent>
-                    <mat-form-field [style.width.%]="100">
-                        <mat-label>Filter</mat-label>
-                        <input matInput type="text" [formControl]="group[disCol]">
-                    </mat-form-field>
-                    <br>
-                    <div class="flex-apart">
-                        <mat-checkbox (change)="hideColumn($event, colIndex, disCol)">Hide from export</mat-checkbox>
-                        <button mat-button [matMenuTriggerFor]="menu">Sort</button>
+                    <div *ngIf="!findMenu[disCol]">
+                        <mat-form-field [style.width.%]="100">
+                            <mat-label>Filter</mat-label>
+                            <input matInput type="text" [formControl]="filterGroup[disCol]">
+                        </mat-form-field>
+                        <br>
+                        <div class="flex-apart">
+                            <mat-checkbox (change)="hideColumn($event, colIndex, disCol)">Hide from export</mat-checkbox>
+                            <button mat-button [matMenuTriggerFor]="menu">Options</button>
+                        </div>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item [matMenuTriggerFor]="sorting">Sort</button>
+                            <button mat-menu-item (click)="findMenu[disCol] = true">Find and Replace</button>
+                        </mat-menu>
+                        <mat-menu #sorting="matMenu">
+                            <div class="flex-apart">
+                                <button mat-icon-button class="shrink-2x" (click)="sort(disCol,'asc')"><mat-icon>arrow_upward</mat-icon></button>
+                                <button mat-icon-button class="shrink-2x" (click)="sort(disCol,'desc')"><mat-icon>arrow_downward</mat-icon></button>
+                            </div>
+                        </mat-menu>
                     </div>
-                    <mat-menu #menu="matMenu">
-                        <button mat-icon-button class="shrink-2x" (click)="sort(disCol,'asc')"><mat-icon>arrow_upward</mat-icon></button>
-                        <button mat-icon-button class="shrink-2x" (click)="sort(disCol,'desc')"><mat-icon>arrow_downward</mat-icon></button>
-                    </mat-menu>
+                    <div *ngIf="findMenu[disCol]">
+                        <mat-form-field [style.width.%]="100">
+                            <mat-label>Find</mat-label>
+                            <input matInput type="text" [formControl]="findGroup[disCol]">
+                        </mat-form-field>
+                        <br>
+                        <mat-form-field [style.width.%]="100">
+                            <mat-label>Replace</mat-label>
+                            <input matInput type="text" [formControl]="replaceGroup[disCol]">
+                        </mat-form-field>
+                        <br>
+                        <div class="flex-apart">
+                            <button mat-button (click)="findMenu[disCol] = false">Cancel</button>
+                            <button mat-button color="primary" (click)="findAndReplace(disCol)">Find & Replace</button>
+                        </div>
+                    </div>
                 </ng-template>
             </mat-expansion-panel>
         </th>

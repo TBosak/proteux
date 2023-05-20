@@ -18,7 +18,10 @@ export class AppComponent implements  OnInit, AfterViewChecked {
   data: any = [];
   hiddenColumns: any[] = [];
   hidden: boolean = true;
-  group: any = {};
+  findMenu: any = {};
+  filterGroup: any = {};
+  findGroup: any = {};
+  replaceGroup: any = {};
   myFormGroup!:FormGroup;
   @ViewChild(MatTableExporterDirective) matTableExporter!: MatTableExporterDirective;
   @ViewChild('paginator') paginator!: MatPaginator;
@@ -52,9 +55,12 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       this.response = datasource;
       this.hidden = false;
       Object.keys(this.response.data[0]).forEach((key: any) => {
-        this.group[key]=new FormControl('');
+        this.filterGroup[key]=new FormControl('');
+        this.findGroup[key]=new FormControl('');
+        this.replaceGroup[key]=new FormControl('');
+        this.findMenu[key]=false;
       });
-      this.myFormGroup = new FormGroup(this.group);
+      this.myFormGroup = new FormGroup(this.filterGroup);
 
       this.myFormGroup.valueChanges.subscribe((data: any) => {
         this.response.data = [...this.data].filter((row: any) => {
@@ -98,6 +104,13 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         else{
           return a[column] < b[column] ? 1 : -1;
         }
+      });
+    }
+
+    findAndReplace(column: string){
+      this.response.data = [...this.response.data].map((row) => {
+        row[column] = row[column].replaceAll(this.findGroup[column].value, this.replaceGroup[column].value);
+        return row;
       });
     }
 
