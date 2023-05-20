@@ -22,7 +22,7 @@
                         </mat-form-field>
                         <br>
                         <div class="flex-apart">
-                            <mat-checkbox (change)="hideColumn($event, colIndex, disCol)">Hide from export</mat-checkbox>
+                            <mat-checkbox (change)="hideColumn($event, colIndex)">Hide from export</mat-checkbox>
                             <button mat-button [matMenuTriggerFor]="menu">Options</button>
                         </div>
                         <mat-menu #menu="matMenu">

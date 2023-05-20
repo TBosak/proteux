@@ -5,6 +5,8 @@ import { MatTableExporterDirective } from 'mat-table-exporter';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatExpansionPanel } from '@angular/material/expansion';
+import * as exportFromJSON from 'export-from-json'
+
 
 @Component({
   selector: 'app-root',
@@ -84,10 +86,22 @@ export class AppComponent implements  OnInit, AfterViewChecked {
 
   export(type: any, opts:any = null){
     this.panels.forEach((panel) => {panel.close()});
-    setTimeout(()=>this.matTableExporter.exportTable(type, opts), 500);
+    if(type == 'json'){
+      const nonHiddenColumns = this.response.data.map((row) => {
+        const newRow: any = {};
+        Object.keys(row).forEach((key) => {
+          if(!this.hiddenColumns.includes(Object.keys(row).indexOf(key))){
+            newRow[key] = row[key];
+          }
+        });
+        return newRow;
+      });
+      exportFromJSON.default({ data: nonHiddenColumns, fileName: 'data', exportType: type });
+    }
+    else{this.matTableExporter.exportTable(type, opts);}
     }
 
-    hideColumn(event: any, index: any, column: any){
+    hideColumn(event: any, index: any){
       if(event.checked){
         this.hiddenColumns.push(index);
       }
@@ -113,5 +127,4 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         return row;
       });
     }
-
 }
