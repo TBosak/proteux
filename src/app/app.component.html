@@ -15,7 +15,7 @@
                     </mat-panel-title>
                 </mat-expansion-panel-header>
                 <ng-template matExpansionPanelContent>
-                    <div *ngIf="!findMenu[disCol] && !renameMenu[disCol]">
+                    <div *ngIf="!findMenu[disCol] && !renameMenu[disCol] && !reorderMenu[disCol]">
                         <mat-form-field [style.width.%]="100">
                             <mat-label>Filter</mat-label>
                             <input matInput type="text" [formControl]="filterGroup[disCol]">
@@ -29,6 +29,7 @@
                             <button mat-menu-item [matMenuTriggerFor]="sorting">Sort</button>
                             <button mat-menu-item (click)="findMenu[disCol] = true">Find and Replace</button>
                             <button mat-menu-item (click)="renameMenu[disCol] = true">Rename</button>
+                            <button mat-menu-item (click)="reorderMenu[disCol] = true">Reorder</button>
                         </mat-menu>
                         <mat-menu #sorting="matMenu">
                             <div class="flex-apart">
@@ -62,6 +63,17 @@
                         <div class="flex-apart">
                             <button mat-button (click)="findMenu[disCol] = false">Cancel</button>
                             <button mat-button color="primary" (click)="findAndReplace(disCol)">Find & Replace</button>
+                        </div>
+                    </div>
+                    <div *ngIf="reorderMenu[disCol]">
+                        <mat-form-field [style.width.%]="100">
+                            <mat-label>New Index</mat-label>
+                            <input matInput type="number" [formControl]="reorderGroup[disCol]">
+                        </mat-form-field>
+                        <br>
+                        <div class="flex-apart">
+                            <button mat-button (click)="reorderMenu[disCol] = false">Cancel</button>
+                            <button mat-button color="primary" (click)="changeColumnIndex(disCol)">Reorder</button>
                         </div>
                     </div>
                 </ng-template>

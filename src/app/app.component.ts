@@ -23,10 +23,12 @@ export class AppComponent implements  OnInit, AfterViewChecked {
   hidden: boolean = true;
   findMenu: any = {};
   renameMenu: any = {};
+  reorderMenu: any = {};
   filterGroup: any = {};
   findGroup: any = {};
   replaceGroup: any = {};
   renameGroup: any = {};
+  reorderGroup: any = {};
   filterSubscription!: Subscription;
   myFormGroup!:FormGroup;
   @ViewChild(MatTableExporterDirective) matTableExporter!: MatTableExporterDirective;
@@ -62,8 +64,10 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         this.findGroup[key]=new FormControl('');
         this.replaceGroup[key]=new FormControl('');
         this.renameGroup[key]=new FormControl('');
+        this.reorderGroup[key]=new FormControl('');
         this.findMenu[key]=false;
         this.renameMenu[key]=false;
+        this.reorderMenu[key]=false;
       });
       this.myFormGroup = new FormGroup(this.filterGroup);
       this.filterSubscription?.unsubscribe();
@@ -164,8 +168,10 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         this.findGroup[newColumn]=this.findGroup[column];
         this.replaceGroup[newColumn]=this.replaceGroup[column];
         this.renameGroup[newColumn]=new FormControl('');
+        this.reorderGroup[newColumn]=this.reorderGroup[column];
         this.findMenu[newColumn]=false;
         this.renameMenu[newColumn]=false;
+        this.reorderMenu[newColumn]=false;
       this.myFormGroup = new FormGroup(this.filterGroup);
       this.filterSubscription?.unsubscribe();
       this.setData();
@@ -182,5 +188,19 @@ export class AppComponent implements  OnInit, AfterViewChecked {
           return match;
         });
       });
+    }
+
+    changeColumnIndex(column: string){
+      const index = this.reorderGroup[column].value;
+      this.data = [...this.response.data].map((row) => {
+        const newRow: any = {};
+        const order = [...Object.keys(row)];
+        order.splice(index, 0, order.splice(order.indexOf(column), 1)[0]);
+        for (const key of order) {
+            newRow[key] = row[key];
+        }
+        return newRow;
+      });
+      this.setData();
     }
 }
