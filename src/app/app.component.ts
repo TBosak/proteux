@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import * as exportFromJSON from 'export-from-json'
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -21,9 +22,12 @@ export class AppComponent implements  OnInit, AfterViewChecked {
   hiddenColumns: any[] = [];
   hidden: boolean = true;
   findMenu: any = {};
+  renameMenu: any = {};
   filterGroup: any = {};
   findGroup: any = {};
   replaceGroup: any = {};
+  renameGroup: any = {};
+  filterSubscription!: Subscription;
   myFormGroup!:FormGroup;
   @ViewChild(MatTableExporterDirective) matTableExporter!: MatTableExporterDirective;
   @ViewChild('paginator') paginator!: MatPaginator;
@@ -52,19 +56,18 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       if(file.type.includes('json')){
         this.data = JSON.parse(text);
       }
-      const datasource = new MatTableDataSource<any>(this.data);
-      datasource.paginator = this.paginator;
-      this.response = datasource;
-      this.hidden = false;
+      this.setData();
       Object.keys(this.response.data[0]).forEach((key: any) => {
         this.filterGroup[key]=new FormControl('');
         this.findGroup[key]=new FormControl('');
         this.replaceGroup[key]=new FormControl('');
+        this.renameGroup[key]=new FormControl('');
         this.findMenu[key]=false;
+        this.renameMenu[key]=false;
       });
       this.myFormGroup = new FormGroup(this.filterGroup);
-
-      this.myFormGroup.valueChanges.subscribe((data: any) => {
+      this.filterSubscription?.unsubscribe();
+      this.filterSubscription = this.myFormGroup.valueChanges.subscribe((data: any) => {
         this.response.data = [...this.data].filter((row: any) => {
           let match = true;
           Object.keys(data).forEach((key: any) => {
@@ -78,6 +81,13 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         });
       });
     });
+  }
+
+  setData(){
+    const datasource = new MatTableDataSource<any>(this.data);
+    datasource.paginator = this.paginator;
+    this.response = datasource;
+    this.hidden = false;
   }
 
   keys(obj: any){
@@ -96,7 +106,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         });
         return newRow;
       });
-      exportFromJSON.default({ data: nonHiddenColumns, fileName: 'data', exportType: type });
+      exportFromJSON.default({ data: nonHiddenColumns, fileName: 'export', exportType: type });
     }
     else{this.matTableExporter.exportTable(type, opts);}
     }
@@ -125,6 +135,52 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       this.response.data = [...this.response.data].map((row) => {
         row[column] = row[column].replaceAll(this.findGroup[column].value, this.replaceGroup[column].value);
         return row;
+      });
+    }
+
+    renameColumn(column: string){
+      const newColumn = this.renameGroup[column].value;
+      if(Object.keys(this.response.data[0]).includes(newColumn)){
+        alert('This column name already exists');
+        return;
+       }
+      if(newColumn.trim() === ''){
+        alert('Column name cannot be empty');
+        return;
+      }
+        this.data = [...this.response.data].map((row) => {
+        const newRow: any = {};
+
+        for (const key of Object.keys(row)) {
+          if (key === column) {
+            newRow[newColumn] = row[key]; // Rename the property
+          } else {
+            newRow[key] = row[key];
+          }
+        }
+        return newRow;
+      });
+        this.filterGroup[newColumn]=this.filterGroup[column];
+        this.findGroup[newColumn]=this.findGroup[column];
+        this.replaceGroup[newColumn]=this.replaceGroup[column];
+        this.renameGroup[newColumn]=new FormControl('');
+        this.findMenu[newColumn]=false;
+        this.renameMenu[newColumn]=false;
+      this.myFormGroup = new FormGroup(this.filterGroup);
+      this.filterSubscription?.unsubscribe();
+      this.setData();
+      this.filterSubscription = this.myFormGroup.valueChanges.subscribe((data: any) => {
+        this.response.data = [...this.data].filter((row: any) => {
+          let match = true;
+          Object.keys(data).forEach((key: any) => {
+            if(data[key] !== ''){
+              if(!row[key].includes(data[key])){
+                match = false;
+              }
+            }
+          });
+          return match;
+        });
       });
     }
 }
