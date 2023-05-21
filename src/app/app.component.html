@@ -79,7 +79,11 @@
                 </ng-template>
             </mat-expansion-panel>
         </th>
-        <td mat-cell [ngClass]="{'hidden' : hiddenColumns.includes(colIndex)}" *matCellDef="let element">{{element[disCol] | strip : '"'}}</td>
+        <td mat-cell *matCellDef="let element">
+            <mat-form-field [ngClass]="{'hidden' : hiddenColumns.includes(colIndex)}" [style.width.%]="100" [style.height.%]="100">
+                <input type="text" matInput [(ngModel)]="element[disCol]">
+            </mat-form-field>
+        </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="keys(response.data[0]); sticky:true"></tr>
     <tr mat-row *matRowDef="let row; columns: keys(response.data[0])"></tr>
