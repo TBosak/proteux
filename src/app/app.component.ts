@@ -98,21 +98,23 @@ export class AppComponent implements  OnInit, AfterViewChecked {
     return Object.keys(obj);
   }
 
-  export(type: any, opts:any = null){
+  export(type: any){
     this.panels.forEach((panel) => {panel.close()});
-    if(type == 'json'){
-      const nonHiddenColumns = this.response.data.map((row) => {
-        const newRow: any = {};
-        Object.keys(row).forEach((key) => {
-          if(!this.hiddenColumns.includes(Object.keys(row).indexOf(key))){
-            newRow[key] = row[key];
-          }
-        });
-        return newRow;
+    const nonHiddenColumns = this.response.data.map((row) => {
+      const newRow: any = {};
+      Object.keys(row).forEach((key) => {
+        if(!this.hiddenColumns.includes(Object.keys(row).indexOf(key))){
+          newRow[key] = row[key];
+        }
       });
+      return newRow;
+    });
+    if(type == 'json'){
       exportFromJSON.default({ data: nonHiddenColumns, fileName: 'export', exportType: type });
     }
-    else{this.matTableExporter.exportTable(type, opts);}
+    if(type=='csv' || type=='txt'){
+      this.exportCSVFile(nonHiddenColumns, type);
+    }
     }
 
     hideColumn(event: any, index: any){
@@ -202,5 +204,44 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         return newRow;
       });
       this.setData();
+    }
+
+    convertToCSV(objArray: string) {
+      var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+      var str = '';
+
+      for (var i = 0; i < array.length; i++) {
+          var line = '';
+          for (var index in array[i]) {
+              if (line != '') line += ','
+
+              line += array[i][index];
+          }
+
+          str += line + '\r\n';
+      }
+
+      return str;
+  }
+
+  exportCSVFile(items: Array<any>, type: string = 'csv') {
+    items.unshift(Object.keys(items[0]));
+    // Convert Object to JSON
+    const jsonObject = JSON.stringify(items);
+    const csv = this.convertToCSV(jsonObject);
+    const exportedFilename = type === 'csv' ? 'export.csv' : 'export.txt';
+
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", exportedFilename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     }
 }

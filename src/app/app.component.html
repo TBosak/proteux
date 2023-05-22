@@ -90,17 +90,17 @@
 </table>
 <mat-paginator [style.width.%]="100" [hidden]="response.data.length < 6" [disabled]="response.data.length < 6" [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
 </mat-paginator>
-<mat-grid-list [style.width.%]="100" *ngIf="!hidden" cols="4" rowHeight="4:1">
-    <mat-grid-tile>
+<mat-grid-list [style.width.%]="100" *ngIf="!hidden" cols="3" rowHeight="3:1">
+    <!-- <mat-grid-tile>
         <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('xlsx', {fileName:'export', sheet: 'sheet', Props: {Author: 'app'}})">Excel</button>
+    </mat-grid-tile> -->
+    <mat-grid-tile>
+        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('csv')">Csv</button>
     </mat-grid-tile>
     <mat-grid-tile>
-        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('csv',{fileName: 'export'})">Csv</button>
+        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('json')">Json</button>
     </mat-grid-tile>
     <mat-grid-tile>
-        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('json',{fileName: 'export'})">Json</button>
-    </mat-grid-tile>
-    <mat-grid-tile>
-        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('txt',{fileName: 'export'})">Txt</button>
+        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('txt')">Txt</button>
     </mat-grid-tile>
 </mat-grid-list>
