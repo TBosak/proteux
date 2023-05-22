@@ -26,10 +26,10 @@
                             <button mat-button [matMenuTriggerFor]="menu">Options</button>
                         </div>
                         <mat-menu #menu="matMenu">
-                            <button mat-menu-item [matMenuTriggerFor]="sorting">Sort</button>
-                            <button mat-menu-item (click)="findMenu[disCol] = true">Find and Replace</button>
+                            <button mat-menu-item (click)="findMenu[disCol] = true">Find & Replace</button>
                             <button mat-menu-item (click)="renameMenu[disCol] = true">Rename</button>
                             <button mat-menu-item (click)="reorderMenu[disCol] = true">Reorder</button>
+                            <button mat-menu-item [matMenuTriggerFor]="sorting">Sort</button>
                         </mat-menu>
                         <mat-menu #sorting="matMenu">
                             <div class="flex-apart">
