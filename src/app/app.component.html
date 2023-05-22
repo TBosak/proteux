@@ -20,7 +20,7 @@
                         <mat-form-field [style.width.%]="100">
                             <mat-label>Filter</mat-label>
                             <input matInput type="text" [formControl]="filterGroup[disCol]">
-                              <button mat-icon-button matSuffix matTooltip="Locks in the filter" (click)="lockFilter(disCol)"><mat-icon>lock</mat-icon></button>
+                              <button [disabled]="lockDisabled[disCol]" mat-icon-button matSuffix matTooltip="Locks in the filter" (click)="lockFilter(disCol)"><mat-icon>lock</mat-icon></button>
                           </mat-form-field>
                         <br>
                         <div class="flex-apart">

@@ -24,12 +24,13 @@ export class AppComponent implements  OnInit, AfterViewChecked {
   findMenu: any = {};
   renameMenu: any = {};
   reorderMenu: any = {};
+  lockDisabled: any = {};
   filterGroup: any = {};
   findGroup: any = {};
   replaceGroup: any = {};
   renameGroup: any = {};
   reorderGroup: any = {};
-  filterSubscription!: Subscription;
+  subscriptions: Subscription[] = [];
   myFormGroup!:FormGroup;
   @ViewChild(MatTableExporterDirective) matTableExporter!: MatTableExporterDirective;
   @ViewChild('paginator') paginator!: MatPaginator;
@@ -215,6 +216,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         this.findMenu[key]=false;
         this.renameMenu[key]=false;
         this.reorderMenu[key]=false;
+        this.lockDisabled[key]=true;
       });
     }
 
@@ -222,8 +224,8 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       this.setData();
       this.clearGroups();
       this.setFormGroups();
-      this.filterSubscription?.unsubscribe();
-      this.filterSubscription = new FormGroup(this.filterGroup).valueChanges.subscribe((data: any) => {
+      this.subscriptions.forEach((sub) => sub.unsubscribe());
+      this.subscriptions.push(new FormGroup(this.filterGroup).valueChanges.subscribe((data: any) => {
         this.response.data = [...this.data].filter((row: any) => {
           let match = true;
           Object.keys(data).forEach((key: any) => {
@@ -235,6 +237,11 @@ export class AppComponent implements  OnInit, AfterViewChecked {
           });
           return match;
         });
+      }));
+      Object.keys(this.filterGroup).forEach((key: any) => {
+        this.subscriptions.push(this.filterGroup[key].valueChanges.subscribe((value: any) => {
+            this.lockDisabled[key] = !(/\S/.test(value));
+        }));
       });
     }
 
