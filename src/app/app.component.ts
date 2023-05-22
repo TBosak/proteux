@@ -58,32 +58,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       if(file.type.includes('json')){
         this.data = JSON.parse(text);
       }
-      this.setData();
-      Object.keys(this.response.data[0]).forEach((key: any) => {
-        this.filterGroup[key]=new FormControl('');
-        this.findGroup[key]=new FormControl('');
-        this.replaceGroup[key]=new FormControl('');
-        this.renameGroup[key]=new FormControl('');
-        this.reorderGroup[key]=new FormControl('');
-        this.findMenu[key]=false;
-        this.renameMenu[key]=false;
-        this.reorderMenu[key]=false;
-      });
-      this.myFormGroup = new FormGroup(this.filterGroup);
-      this.filterSubscription?.unsubscribe();
-      this.filterSubscription = this.myFormGroup.valueChanges.subscribe((data: any) => {
-        this.response.data = [...this.data].filter((row: any) => {
-          let match = true;
-          Object.keys(data).forEach((key: any) => {
-            if(data[key] !== ''){
-              if(!row[key].includes(data[key])){
-                match = false;
-              }
-            }
-          });
-          return match;
-        });
-      });
+      this.createFilterSubscription();
     });
   }
 
@@ -154,7 +129,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         alert('Column name cannot be empty');
         return;
       }
-        this.data = [...this.response.data].map((row) => {
+        this.data = [...this.data].map((row) => {
         const newRow: any = {};
 
         for (const key of Object.keys(row)) {
@@ -166,30 +141,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         }
         return newRow;
       });
-        this.filterGroup[newColumn]=this.filterGroup[column];
-        this.findGroup[newColumn]=this.findGroup[column];
-        this.replaceGroup[newColumn]=this.replaceGroup[column];
-        this.renameGroup[newColumn]=new FormControl('');
-        this.reorderGroup[newColumn]=this.reorderGroup[column];
-        this.findMenu[newColumn]=false;
-        this.renameMenu[newColumn]=false;
-        this.reorderMenu[newColumn]=false;
-      this.myFormGroup = new FormGroup(this.filterGroup);
-      this.filterSubscription?.unsubscribe();
-      this.setData();
-      this.filterSubscription = this.myFormGroup.valueChanges.subscribe((data: any) => {
-        this.response.data = [...this.data].filter((row: any) => {
-          let match = true;
-          Object.keys(data).forEach((key: any) => {
-            if(data[key] !== ''){
-              if(!row[key].includes(data[key])){
-                match = false;
-              }
-            }
-          });
-          return match;
-        });
-      });
+      this.createFilterSubscription();
     }
 
     changeColumnIndex(column: string){
@@ -243,5 +195,46 @@ export class AppComponent implements  OnInit, AfterViewChecked {
             link.click();
             document.body.removeChild(link);
         }
+    }
+
+    clearGroups(){
+      this.filterGroup = {};
+      this.findGroup = {};
+      this.replaceGroup = {};
+      this.renameGroup = {};
+      this.reorderGroup = {};
+    }
+
+    setFormGroups(){
+      Object.keys(this.response.data[0]).forEach((key: any) => {
+        this.filterGroup[key]=this.filterGroup[key] ?? new FormControl('');
+        this.findGroup[key]=this.findGroup[key] ?? new FormControl('');
+        this.replaceGroup[key]=this.replaceGroup[key] ?? new FormControl('');
+        this.renameGroup[key]=this.renameGroup[key] ?? new FormControl('');
+        this.reorderGroup[key]=this.reorderGroup[key] ?? new FormControl('');
+        this.findMenu[key]=this.findMenu[key] ?? false;
+        this.renameMenu[key]=this.renameMenu[key] ?? false;
+        this.reorderMenu[key]=this.reorderMenu[key] ?? false;
+      });
+    }
+
+    createFilterSubscription(){
+      this.setData();
+      this.clearGroups();
+      this.setFormGroups();
+      this.filterSubscription?.unsubscribe();
+      this.filterSubscription = new FormGroup(this.filterGroup).valueChanges.subscribe((data: any) => {
+        this.response.data = [...this.data].filter((row: any) => {
+          let match = true;
+          Object.keys(data).forEach((key: any) => {
+            if(data[key] !== ''){
+              if(!row[key].includes(data[key])){
+                match = false;
+              }
+            }
+          });
+          return match;
+        });
+      });
     }
 }
