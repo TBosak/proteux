@@ -237,4 +237,12 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         });
       });
     }
+
+    lockFilter(column: string){
+      this.data = [...this.data].filter((row: any) => {
+        return row[column].includes(this.filterGroup[column].value);
+      });
+      this.setData();
+      this.filterGroup[column].value = '';
+    }
 }

@@ -20,7 +20,8 @@
                         <mat-form-field [style.width.%]="100">
                             <mat-label>Filter</mat-label>
                             <input matInput type="text" [formControl]="filterGroup[disCol]">
-                        </mat-form-field>
+                              <button mat-icon-button matSuffix matTooltip="Locks in the filter" (click)="lockFilter(disCol)"><mat-icon>lock</mat-icon></button>
+                          </mat-form-field>
                         <br>
                         <div class="flex-apart">
                             <mat-checkbox (change)="hideColumn($event, colIndex)">Hide from export</mat-checkbox>
