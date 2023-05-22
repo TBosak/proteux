@@ -5,6 +5,7 @@
               Upload File
             </button>
 </mat-toolbar>
+<div style="overflow: auto;">
 <table [style.width.%]="100" mat-table matTableExporter [hidden]="hidden" #table [dataSource]="response" [hiddenColumns]="hiddenColumns">
     <ng-container *ngFor="let disCol of keys(response.data[0]); let colIndex = index" matColumnDef="{{disCol}}">
         <th mat-header-cell *matHeaderCellDef>
@@ -88,6 +89,7 @@
     <tr mat-header-row *matHeaderRowDef="keys(response.data[0]); sticky:true"></tr>
     <tr mat-row *matRowDef="let row; columns: keys(response.data[0])"></tr>
 </table>
+</div>
 <mat-paginator [style.width.%]="100" [hidden]="response.data.length < 6" [disabled]="response.data.length < 6" [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
 </mat-paginator>
 <mat-grid-list [style.width.%]="100" *ngIf="!hidden" cols="3" rowHeight="3:1">
