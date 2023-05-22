@@ -207,14 +207,14 @@ export class AppComponent implements  OnInit, AfterViewChecked {
 
     setFormGroups(){
       Object.keys(this.response.data[0]).forEach((key: any) => {
-        this.filterGroup[key]=this.filterGroup[key] ?? new FormControl('');
-        this.findGroup[key]=this.findGroup[key] ?? new FormControl('');
-        this.replaceGroup[key]=this.replaceGroup[key] ?? new FormControl('');
-        this.renameGroup[key]=this.renameGroup[key] ?? new FormControl('');
-        this.reorderGroup[key]=this.reorderGroup[key] ?? new FormControl('');
-        this.findMenu[key]=this.findMenu[key] ?? false;
-        this.renameMenu[key]=this.renameMenu[key] ?? false;
-        this.reorderMenu[key]=this.reorderMenu[key] ?? false;
+        this.filterGroup[key]=new FormControl('');
+        this.findGroup[key]=new FormControl('');
+        this.replaceGroup[key]=new FormControl('');
+        this.renameGroup[key]=new FormControl('');
+        this.reorderGroup[key]=new FormControl('');
+        this.findMenu[key]=false;
+        this.renameMenu[key]=false;
+        this.reorderMenu[key]=false;
       });
     }
 
