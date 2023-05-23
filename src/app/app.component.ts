@@ -18,8 +18,9 @@ import { Subscription } from 'rxjs';
 export class AppComponent implements  OnInit, AfterViewChecked {
   title = 'app';
   response = new MatTableDataSource<any>([{}]);
-  data: any = [];
+  data: any = [{}];
   hiddenColumns: any[] = [];
+  keys: any[] = [];
   hidden: boolean = true;
   findMenu: any = {};
   renameMenu: any = {};
@@ -28,10 +29,13 @@ export class AppComponent implements  OnInit, AfterViewChecked {
   filterGroup: any = {};
   findGroup: any = {};
   replaceGroup: any = {};
+  regexGroup: any = {};
+  regexFilterGroup: any = {};
   renameGroup: any = {};
   reorderGroup: any = {};
   subscriptions: Subscription[] = [];
-  myFormGroup!:FormGroup;
+  filterFormGroup!:FormGroup;
+  regexFormGroup!:FormGroup;
   @ViewChild(MatTableExporterDirective) matTableExporter!: MatTableExporterDirective;
   @ViewChild('paginator') paginator!: MatPaginator;
   @ViewChild('fileInput') fileInput!: ElementRef;
@@ -59,6 +63,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       if(file.type.includes('json')){
         this.data = JSON.parse(text);
       }
+      this.keys=Object.keys(this.data[0]);
       this.createFilterSubscription();
     });
   }
@@ -68,10 +73,6 @@ export class AppComponent implements  OnInit, AfterViewChecked {
     datasource.paginator = this.paginator;
     this.response = datasource;
     this.hidden = false;
-  }
-
-  keys(obj: any){
-    return Object.keys(obj);
   }
 
   export(type: any){
@@ -142,12 +143,13 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         }
         return newRow;
       });
+      this.keys=Object.keys(this.data[0]);
       this.createFilterSubscription();
     }
 
     changeColumnIndex(column: string){
       const index = this.reorderGroup[column].value;
-      this.data = [...this.response.data].map((row) => {
+      this.data = [...this.data].map((row) => {
         const newRow: any = {};
         const order = [...Object.keys(row)];
         order.splice(index, 0, order.splice(order.indexOf(column), 1)[0]);
@@ -156,6 +158,7 @@ export class AppComponent implements  OnInit, AfterViewChecked {
         }
         return newRow;
       });
+      this.keys=Object.keys(this.data[0]);
       this.setData();
     }
 
@@ -204,52 +207,90 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       this.replaceGroup = {};
       this.renameGroup = {};
       this.reorderGroup = {};
+      this.regexGroup = {};
     }
 
     setFormGroups(){
-      Object.keys(this.response.data[0]).forEach((key: any) => {
+      this.keys.forEach((key: any) => {
         this.filterGroup[key]=new FormControl('');
         this.findGroup[key]=new FormControl('');
         this.replaceGroup[key]=new FormControl('');
         this.renameGroup[key]=new FormControl('');
         this.reorderGroup[key]=new FormControl('');
+        this.regexFilterGroup[key]=new FormControl('');
         this.findMenu[key]=false;
         this.renameMenu[key]=false;
         this.reorderMenu[key]=false;
+        this.regexGroup[key]=false;
         this.lockDisabled[key]=true;
       });
     }
 
-    createFilterSubscription(){
+    createFilterSubscription() {
       this.setData();
       this.clearGroups();
       this.setFormGroups();
-      this.subscriptions.forEach((sub) => sub.unsubscribe());
-      this.subscriptions.push(new FormGroup(this.filterGroup).valueChanges.subscribe((data: any) => {
-        this.response.data = [...this.data].filter((row: any) => {
-          let match = true;
-          Object.keys(data).forEach((key: any) => {
-            if(data[key] !== ''){
-              if(!row[key].includes(data[key])){
+
+      this.subscriptions.forEach(sub => sub.unsubscribe());
+
+      this.filterFormGroup = new FormGroup(this.filterGroup);
+      this.subscriptions.push(
+        this.filterFormGroup.valueChanges.subscribe(data => {
+          this.response.data = this.filterData(data);
+        })
+      );
+
+      this.regexFormGroup = new FormGroup(this.regexFilterGroup);
+      this.subscriptions.push(
+        this.regexFormGroup.valueChanges.subscribe(data => {
+          this.response.data = this.filterData(data, true);
+        })
+      );
+
+      this.lockDisabledSubscribe(this.filterGroup);
+      this.lockDisabledSubscribe(this.regexFilterGroup);
+    }
+
+    filterData(data:any, useRegex = false) {
+      return [...this.data].filter(row => {
+        let match = true;
+        Object.keys(data).forEach(key => {
+          if (data[key] !== '') {
+            if (useRegex) {
+              const regex = new RegExp(data[key]);
+              match = regex.test(row[key]);
+            } else {
+              if (!row[key].includes(data[key])) {
                 match = false;
               }
             }
-          });
-          return match;
+          }
         });
-      }));
-      Object.keys(this.filterGroup).forEach((key: any) => {
-        this.subscriptions.push(this.filterGroup[key].valueChanges.subscribe((value: any) => {
+        return match;
+      });
+    }
+
+    lockDisabledSubscribe(group:any) {
+      Object.keys(group).forEach(key => {
+        this.subscriptions.push(
+          group[key].valueChanges.subscribe((value: any) => {
             this.lockDisabled[key] = !(/\S/.test(value));
-        }));
+          })
+        );
       });
     }
 
     lockFilter(column: string){
       this.data = [...this.data].filter((row: any) => {
-        return row[column].includes(this.filterGroup[column].value);
+        const regex = new RegExp(this.regexFilterGroup[column].value);
+        return this.regexGroup[column] ? regex.test(row[column]) : row[column].includes(this.filterGroup[column].value);
       });
       this.setData();
       this.filterGroup[column].value = '';
+    }
+
+    clearFilters(column: string){
+      this.filterFormGroup.controls[column].setValue('');
+      this.regexFormGroup.controls[column].setValue('');
     }
 }
