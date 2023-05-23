@@ -23,6 +23,8 @@
         "axios": "^1.4.0",
         "export-from-json": "^1.7.2",
         "html-table-to-json": "^1.0.0",
+        "json-to-markdown-table": "^1.0.0",
+        "jstoxml": "^3.2.7",
         "mat-table-exporter": "^15.0.0",
         "papaparse": "^5.4.1",
         "rxjs": "~7.8.0",

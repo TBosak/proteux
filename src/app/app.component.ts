@@ -90,8 +90,19 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       exportFromJSON.default({ data: nonHiddenColumns, fileName: 'export', exportType: type });
     }
     if(type=='csv' || type=='txt'){
-      this.exportCSVFile(nonHiddenColumns, type);
+      const csv = this.convertToCSV(nonHiddenColumns);
+      this.exportFile(csv, type);
     }
+    if(type=='md'){
+      var parser = require('json-to-markdown-table');
+      const data = parser(nonHiddenColumns, Object.keys(nonHiddenColumns[0]));
+      this.exportFile(data, type);
+    }
+    // if(type='xml'){
+
+    //   var data = parser.toXml(nonHiddenColumns);
+    //   this.exportFile(data, type);
+    // }
     }
 
     hideColumn(event: any, index: any){
@@ -162,8 +173,11 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       this.setData();
     }
 
-    convertToCSV(objArray: string) {
-      var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    convertToCSV(items: Array<any>) {
+      items.unshift(Object.keys(items[0]));
+      // Convert Object to JSON
+      const jsonObject = JSON.stringify(items);
+      var array = typeof jsonObject != 'object' ? JSON.parse(jsonObject) : jsonObject;
       var str = '';
 
       for (var i = 0; i < array.length; i++) {
@@ -180,25 +194,20 @@ export class AppComponent implements  OnInit, AfterViewChecked {
       return str;
   }
 
-  exportCSVFile(items: Array<any>, type: string = 'csv') {
-    items.unshift(Object.keys(items[0]));
-    // Convert Object to JSON
-    const jsonObject = JSON.stringify(items);
-    const csv = this.convertToCSV(jsonObject);
-    const exportedFilename = type === 'csv' ? 'export.csv' : 'export.txt';
-
-    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        var link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-            // Browsers that support HTML5 download attribute
-            var url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", exportedFilename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+    exportFile(data: any, type: string){
+      const exportedFilename = 'export.' + type;
+      var blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+          var link = document.createElement("a");
+          if (link.download !== undefined) { // feature detection
+              // Browsers that support HTML5 download attribute
+              var url = URL.createObjectURL(blob);
+              link.setAttribute("href", url);
+              link.setAttribute("download", exportedFilename);
+              link.style.visibility = 'hidden';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+          }
     }
 
     clearGroups(){
