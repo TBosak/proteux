@@ -1,117 +1,123 @@
 <mat-toolbar class="mat-elevation-z5" style="background-color: rgb(66, 66, 66);">
-    <input #fileInput style="display: none;" (change)="process($event)" type="file" />
-    <button [style.width.%]="100" mat-raised-button color="primary" (click)="clickFileInput()">
-              <mat-icon>attach_file</mat-icon>
-              Upload File
-            </button>
+  <input #fileInput style="display: none;" (change)="process($event)" type="file" multiple />
+  <button [style.width.%]="100" mat-raised-button color="primary" (click)="clickFileInput()">
+    <mat-icon>attach_file</mat-icon>
+    Upload File
+  </button>
 </mat-toolbar>
 <div style="overflow: auto;">
-<table [style.width.%]="100" mat-table matTableExporter [hidden]="hidden" #table [dataSource]="response" [hiddenColumns]="hiddenColumns">
+  <table [style.width.%]="100" mat-table matTableExporter [hidden]="hidden" #table [dataSource]="response"
+    [hiddenColumns]="hiddenColumns">
     <ng-container *ngFor="let disCol of keys; let colIndex = index" matColumnDef="{{disCol}}">
-        <th mat-header-cell *matHeaderCellDef>
-            <mat-expansion-panel #panel [expanded]="false">
-                <mat-expansion-panel-header>
-                    <mat-panel-title [ngClass]="{'hidden' : hiddenColumns.includes(colIndex)}">
-                        {{disCol | strip : '"'}}
-                    </mat-panel-title>
-                </mat-expansion-panel-header>
-                <ng-template matExpansionPanelContent>
-                    <div *ngIf="!findMenu[disCol] && !renameMenu[disCol] && !reorderMenu[disCol]">
-                        <mat-form-field [style.width.%]="100" appearance="outline">
-                            <mat-label>Filter</mat-label>
-                            <input matInput type="text" *ngIf="!regexGroup[disCol]" [formControl]="filterGroup[disCol]">
-                            <input matInput type="text" *ngIf="regexGroup[disCol]" [formControl]="regexFilterGroup[disCol]">
-                              <button [disabled]="lockDisabled[disCol]" mat-icon-button matSuffix matTooltip="Locks in the filter" (click)="lockFilter(disCol)"><mat-icon>lock</mat-icon></button>
-                            </mat-form-field>
-                            <div class="flex-apart" style="margin-top:-5px;">
-                              <mat-slide-toggle class="shrink-75x" style="margin-top:-25px;" (change)="clearFilters(disCol)" [(ngModel)]="regexGroup[disCol]">REGEX</mat-slide-toggle>
-                              <button  mat-button [matMenuTriggerFor]="menu">Options</button>
-                          </div>
-                        <br>
-                        <mat-menu #menu="matMenu">
-                            <button mat-menu-item (click)="findMenu[disCol] = true">Find & Replace</button>
-                            <button mat-menu-item [matMenuTriggerFor]="hide">Hide</button>
-                            <button mat-menu-item (click)="renameMenu[disCol] = true">Rename</button>
-                            <button mat-menu-item (click)="reorderMenu[disCol] = true">Reorder</button>
-                            <button mat-menu-item [matMenuTriggerFor]="sorting">Sort</button>
-                        </mat-menu>
-                        <mat-menu #sorting="matMenu">
-                            <div class="flex-apart">
-                                <button mat-icon-button class="shrink-75x" (click)="sort(disCol,'asc')"><mat-icon>arrow_upward</mat-icon></button>
-                                <button mat-icon-button class="shrink-75x" (click)="sort(disCol,'desc')"><mat-icon>arrow_downward</mat-icon></button>
-                            </div>
-                        </mat-menu>
-                        <mat-menu #hide="matMenu">
-                          <mat-checkbox (change)="hideColumn($event, colIndex)">Hide from export&nbsp;&nbsp;</mat-checkbox>
-                        </mat-menu>
-                    </div>
-                    <div *ngIf="renameMenu[disCol]">
-                        <mat-form-field [style.width.%]="100">
-                            <mat-label>Rename</mat-label>
-                            <input matInput type="text" [formControl]="renameGroup[disCol]">
-                        </mat-form-field>
-                        <br>
-                        <div class="flex-apart">
-                            <button mat-button (click)="renameMenu[disCol] = false">Cancel</button>
-                            <button mat-button color="primary" (click)="renameColumn(disCol)">Rename</button>
-                        </div>
-                    </div>
-                    <div *ngIf="findMenu[disCol]">
-                        <mat-form-field [style.width.%]="100">
-                            <mat-label>Find</mat-label>
-                            <input matInput type="text" [formControl]="findGroup[disCol]">
-                        </mat-form-field>
-                        <br>
-                        <mat-form-field [style.width.%]="100">
-                            <mat-label>Replace</mat-label>
-                            <input matInput type="text" [formControl]="replaceGroup[disCol]">
-                        </mat-form-field>
-                        <br>
-                        <div class="flex-apart">
-                            <button mat-button (click)="findMenu[disCol] = false">Cancel</button>
-                            <button mat-button color="primary" (click)="findAndReplace(disCol)">Find & Replace</button>
-                        </div>
-                    </div>
-                    <div *ngIf="reorderMenu[disCol]">
-                        <mat-form-field [style.width.%]="100">
-                            <mat-label>New Index</mat-label>
-                            <input matInput type="number" [formControl]="reorderGroup[disCol]">
-                        </mat-form-field>
-                        <br>
-                        <div class="flex-apart">
-                            <button mat-button (click)="reorderMenu[disCol] = false">Cancel</button>
-                            <button mat-button color="primary" (click)="changeColumnIndex(disCol)">Reorder</button>
-                        </div>
-                    </div>
-                </ng-template>
-            </mat-expansion-panel>
-        </th>
-        <td mat-cell *matCellDef="let element">
-            <mat-form-field  appearance="outline" [style.width.%]="100" [style.height.%]="100">
-                <input type="text" matInput [(ngModel)]="element[disCol]">
-            </mat-form-field>
-        </td>
+      <th mat-header-cell *matHeaderCellDef>
+        <mat-expansion-panel #panel [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title [ngClass]="{'hidden' : hiddenColumns.includes(colIndex)}">
+              {{disCol | strip : '"'}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <div *ngIf="!findMenu[disCol] && !renameMenu[disCol] && !reorderMenu[disCol]">
+              <mat-form-field [style.width.%]="100" appearance="outline">
+                <mat-label>Filter</mat-label>
+                <input matInput type="text" *ngIf="!regexGroup[disCol]" [formControl]="filterGroup[disCol]">
+                <input matInput type="text" *ngIf="regexGroup[disCol]" [formControl]="regexFilterGroup[disCol]">
+                <button [disabled]="lockDisabled[disCol]" mat-icon-button matSuffix matTooltip="Locks in the filter"
+                  (click)="lockFilter(disCol)"><mat-icon>lock</mat-icon></button>
+              </mat-form-field>
+              <div class="flex-apart" style="margin-top:-5px;">
+                <mat-slide-toggle class="shrink-75x" style="margin-top:-25px;" (change)="clearFilters(disCol)"
+                  [(ngModel)]="regexGroup[disCol]">REGEX</mat-slide-toggle>
+                <button mat-button [matMenuTriggerFor]="menu">Options</button>
+              </div>
+              <br>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="findMenu[disCol] = true">Find & Replace</button>
+                <button mat-menu-item [matMenuTriggerFor]="hide">Hide</button>
+                <button mat-menu-item (click)="renameMenu[disCol] = true">Rename</button>
+                <button mat-menu-item (click)="reorderMenu[disCol] = true">Reorder</button>
+                <button mat-menu-item [matMenuTriggerFor]="sorting">Sort</button>
+              </mat-menu>
+              <mat-menu #sorting="matMenu">
+                <div class="flex-apart">
+                  <button mat-icon-button class="shrink-75x"
+                    (click)="sort(disCol,'asc')"><mat-icon>arrow_upward</mat-icon></button>
+                  <button mat-icon-button class="shrink-75x"
+                    (click)="sort(disCol,'desc')"><mat-icon>arrow_downward</mat-icon></button>
+                </div>
+              </mat-menu>
+              <mat-menu #hide="matMenu">
+                <mat-checkbox (change)="hideColumn($event, colIndex)">Hide from export&nbsp;&nbsp;</mat-checkbox>
+              </mat-menu>
+            </div>
+            <div *ngIf="renameMenu[disCol]">
+              <mat-form-field [style.width.%]="100">
+                <mat-label>Rename</mat-label>
+                <input matInput type="text" [formControl]="renameGroup[disCol]">
+              </mat-form-field>
+              <br>
+              <div class="flex-apart">
+                <button mat-button (click)="renameMenu[disCol] = false">Cancel</button>
+                <button mat-button color="primary" (click)="renameColumn(disCol)">Rename</button>
+              </div>
+            </div>
+            <div *ngIf="findMenu[disCol]">
+              <mat-form-field [style.width.%]="100">
+                <mat-label>Find</mat-label>
+                <input matInput type="text" [formControl]="findGroup[disCol]">
+              </mat-form-field>
+              <br>
+              <mat-form-field [style.width.%]="100">
+                <mat-label>Replace</mat-label>
+                <input matInput type="text" [formControl]="replaceGroup[disCol]">
+              </mat-form-field>
+              <br>
+              <div class="flex-apart">
+                <button mat-button (click)="findMenu[disCol] = false">Cancel</button>
+                <button mat-button color="primary" (click)="findAndReplace(disCol)">Find & Replace</button>
+              </div>
+            </div>
+            <div *ngIf="reorderMenu[disCol]">
+              <mat-form-field [style.width.%]="100">
+                <mat-label>New Index</mat-label>
+                <input matInput type="number" [formControl]="reorderGroup[disCol]">
+              </mat-form-field>
+              <br>
+              <div class="flex-apart">
+                <button mat-button (click)="reorderMenu[disCol] = false">Cancel</button>
+                <button mat-button color="primary" (click)="changeColumnIndex(disCol)">Reorder</button>
+              </div>
+            </div>
+          </ng-template>
+        </mat-expansion-panel>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <mat-form-field appearance="outline" [style.width.%]="100" [style.height.%]="100">
+          <input type="text" matInput [(ngModel)]="element[disCol]">
+        </mat-form-field>
+      </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="keys; sticky:true"></tr>
     <tr mat-row *matRowDef="let row; columns: keys"></tr>
-</table>
+  </table>
 </div>
-<mat-paginator [style.width.%]="100" [hidden]="response.data.length < 6" [disabled]="response.data.length < 6" [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
+<mat-paginator [style.width.%]="100" [hidden]="response.data.length < 6" [disabled]="response.data.length < 6"
+  [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
 </mat-paginator>
 <mat-grid-list [style.width.%]="100" *ngIf="!hidden" cols="4" rowHeight="4:1">
-    <!-- <mat-grid-tile>
+  <!-- <mat-grid-tile>
         <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('xlsx', {fileName:'export', sheet: 'sheet', Props: {Author: 'app'}})">Excel</button>
     </mat-grid-tile> -->
-    <mat-grid-tile>
-        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('csv')">Csv</button>
-    </mat-grid-tile>
-    <mat-grid-tile>
-        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('json')">Json</button>
-    </mat-grid-tile>
-    <mat-grid-tile>
-        <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('txt')">Txt</button>
-    </mat-grid-tile>
-    <mat-grid-tile>
-      <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('md')">Markdown</button>
+  <mat-grid-tile>
+    <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('csv')">Csv</button>
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('json')">Json</button>
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('txt')">Txt</button>
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('md')">Markdown</button>
   </mat-grid-tile>
 </mat-grid-list>
