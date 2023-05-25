@@ -60,7 +60,7 @@ export class AppComponent implements AfterViewChecked {
         this.createFilterSubscription();
       });
     } else if (fileList.length > 1) {
-      const mergeValue = prompt('Select unique field(s) to join on?', 'ID,Name');
+      const mergeValue = prompt('Select unique field(s) to join on?', 'ID, Name');
       const fileTasks = [];
       const data: Array<any[]> = [];
 
