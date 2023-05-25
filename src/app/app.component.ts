@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 
-export class AppComponent implements OnInit, AfterViewChecked {
+export class AppComponent implements AfterViewChecked {
   title = 'app';
   response = new MatTableDataSource<any>([{}]);
   data: any = [{}];
@@ -40,10 +40,6 @@ export class AppComponent implements OnInit, AfterViewChecked {
   @ViewChild('paginator') paginator!: MatPaginator;
   @ViewChild('fileInput') fileInput!: ElementRef;
   @ViewChildren('panel') panels!: QueryList<MatExpansionPanel>;
-
-  ngOnInit(): void {
-
-  }
 
   ngAfterViewChecked(): void {
     if (!this.response.paginator) this.response.paginator = this.paginator;
@@ -70,7 +66,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
       });
     }
     if (fileList.length > 1) {
-      let mergeValue = prompt('Select unique field to merge on:', 'id');
+      let mergeValue = prompt('Select unique field to merge on?', 'ID');
       let fileTasks = [];
       let data: Array<any[]> = [];
       for (let i = 0; i < fileList.length; i++) {
@@ -84,9 +80,16 @@ export class AppComponent implements OnInit, AfterViewChecked {
           }
         }));
         Promise.all(fileTasks).then(() => {
-          this.data = this.mergeTables(data, mergeValue);
-          this.keys = Object.keys(this.data[0]);
-          this.createFilterSubscription();
+          if(mergeValue){
+            this.data = this.mergeTables(data, mergeValue);
+            this.keys = Object.keys(this.data[0]);
+            this.createFilterSubscription();
+          }
+          else{
+            this.data = data.flat();
+            this.keys = Object.keys(this.data[0]);
+            this.createFilterSubscription();
+          }
         });
       }
     }
@@ -138,11 +141,6 @@ export class AppComponent implements OnInit, AfterViewChecked {
       const data = parser(nonHiddenColumns, Object.keys(nonHiddenColumns[0]));
       this.exportFile(data, type);
     }
-    // if(type='xml'){
-
-    //   var data = parser.toXml(nonHiddenColumns);
-    //   this.exportFile(data, type);
-    // }
   }
 
   hideColumn(event: any, index: any) {
