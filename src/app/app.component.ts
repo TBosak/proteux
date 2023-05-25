@@ -60,9 +60,9 @@ export class AppComponent implements AfterViewChecked {
         this.createFilterSubscription();
       });
     } else if (fileList.length > 1) {
-      let mergeValue = prompt('Select unique field(s) to join on?', 'ID,Name');
-      let fileTasks = [];
-      let data: Array<any[]> = [];
+      const mergeValue = prompt('Select unique field(s) to join on?', 'ID,Name');
+      const fileTasks = [];
+      const data: Array<any[]> = [];
 
       for (let i = 0; i < fileList.length; i++) {
         const file = fileList[i];
@@ -82,11 +82,12 @@ export class AppComponent implements AfterViewChecked {
     }
   }
 
+
   readFile(file: File): Promise<any[]> {
     return new Promise((resolve) => {
       const reader = new FileReader();
 
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         const text = event.target?.result as string;
         let parsedData: any[];
 
@@ -96,7 +97,16 @@ export class AppComponent implements AfterViewChecked {
         } else if (file.type.includes('json')) {
           parsedData = JSON.parse(text);
           resolve(parsedData);
+        } else if (file.name.includes('.md')) {
+          parsedData = [];
+          const { createMarkdownObjectTable } = await import('parse-markdown-table')
+          const table = await createMarkdownObjectTable(text)
+          for await (const row of table) {
+            parsedData.push(row);
+          }
+          resolve(parsedData);
         }
+        
       };
 
       reader.readAsText(file);
@@ -104,6 +114,7 @@ export class AppComponent implements AfterViewChecked {
   }
 
   mergeTables(data: any[], mergeValues: string[]): any[] {
+    mergeValues = mergeValues.map((value) => value.trim());
     const merged: { [key: string]: any } = {};
 
     data.forEach((table: any) => {
@@ -254,11 +265,11 @@ export class AppComponent implements AfterViewChecked {
 
   exportFile(data: any, type: string) {
     const exportedFilename = 'export.' + type;
-    var blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
-    var link = document.createElement("a");
+    const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
     if (link.download !== undefined) { // feature detection
       // Browsers that support HTML5 download attribute
-      var url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
       link.setAttribute("download", exportedFilename);
       link.style.visibility = 'hidden';
