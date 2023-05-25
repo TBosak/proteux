@@ -52,66 +52,86 @@ export class AppComponent implements AfterViewChecked {
   process(event: any) {
     const target = event.target as HTMLInputElement;
     const fileList = target.files as FileList;
+
     if (fileList.length === 1) {
       const file = fileList[0];
-      file.text().then((text) => {
-        if (file.type.includes('csv')) {
-          this.data = Papa.parse(text, { header: true, skipEmptyLines: true }).data;
+      this.readFile(file).then((parsedData) => {
+        this.data = parsedData;
+        this.createFilterSubscription();
+      });
+    } else if (fileList.length > 1) {
+      let mergeValue = prompt('Select unique field(s) to join on?', 'ID,Name');
+      let fileTasks = [];
+      let data: Array<any[]> = [];
+
+      for (let i = 0; i < fileList.length; i++) {
+        const file = fileList[i];
+        fileTasks.push(this.readFile(file).then((parsedData) => {
+          data.push(parsedData);
+        }));
+      }
+
+      Promise.all(fileTasks).then(() => {
+        if (mergeValue) {
+          this.data = this.mergeTables(data, mergeValue.split(','));
+        } else {
+          this.data = data.flat();
         }
-        if (file.type.includes('json')) {
-          this.data = JSON.parse(text);
-        }
-        this.keys = Object.keys(this.data[0]);
         this.createFilterSubscription();
       });
     }
-    if (fileList.length > 1) {
-      let mergeValue = prompt('Select unique field to merge on?', 'ID');
-      let fileTasks = [];
-      let data: Array<any[]> = [];
-      for (let i = 0; i < fileList.length; i++) {
-        const file = fileList[i];
-        fileTasks.push(file.text().then((text) => {
-          if (file.type.includes('csv')) {
-            data.push(Papa.parse(text, { header: true, skipEmptyLines: true }).data);
-          }
-          if (file.type.includes('json')) {
-            data.push(JSON.parse(text));
-          }
-        }));
-        Promise.all(fileTasks).then(() => {
-          if(mergeValue){
-            this.data = this.mergeTables(data, mergeValue);
-            this.keys = Object.keys(this.data[0]);
-            this.createFilterSubscription();
-          }
-          else{
-            this.data = data.flat();
-            this.keys = Object.keys(this.data[0]);
-            this.createFilterSubscription();
-          }
-        });
-      }
-    }
   }
 
-  mergeTables(data: any, mergeValue: any) {
-    let merged: any[] = [];
+  readFile(file: File): Promise<any[]> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        let parsedData: any[];
+
+        if (file.type.includes('csv')) {
+          parsedData = Papa.parse(text, { header: true, skipEmptyLines: true }).data;
+          resolve(parsedData);
+        } else if (file.type.includes('json')) {
+          parsedData = JSON.parse(text);
+          resolve(parsedData);
+        }
+      };
+
+      reader.readAsText(file);
+    });
+  }
+
+  mergeTables(data: any[], mergeValues: string[]): any[] {
+    const merged: { [key: string]: any } = {};
+
     data.forEach((table: any) => {
       table.forEach((row: any) => {
-        const index = merged.findIndex((r: any) => r[mergeValue] === row[mergeValue]);
-        if (index === -1) {
-          merged.push(row);
-        }
-        else {
-          merged[index] = { ...merged[index], ...row };
+        let mergeKey = '';
+        mergeValues.forEach((mergeValue: string) => {
+          mergeKey += `${row[mergeValue]}-`;
+        });
+
+        if (!(mergeKey in merged)) {
+          merged[mergeKey] = { ...row };
+        } else {
+          merged[mergeKey] = { ...merged[mergeKey], ...row };
         }
       });
     });
-    return merged;
+
+    const result: any[] = [];
+
+    Object.keys(merged).forEach((key) => {
+      result.push(merged[key]);
+    });
+
+    return result;
   }
 
   setData() {
+    this.keys = Object.keys(this.data[0]);
     const datasource = new MatTableDataSource<any>(this.data);
     datasource.paginator = this.paginator;
     this.response = datasource;
