@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import * as Papa from 'papaparse';
 import { MatTableExporterDirective } from 'mat-table-exporter';
@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 
-export class AppComponent implements AfterViewChecked {
+export class AppComponent implements AfterViewChecked, OnDestroy {
   title = 'app';
   response = new MatTableDataSource<any>([{}]);
   data: any = [{}];
@@ -28,7 +28,9 @@ export class AppComponent implements AfterViewChecked {
   lockDisabled: any = {};
   filterGroup: any = {};
   findGroup: any = {};
+  findRegexGroup: any = {};
   replaceGroup: any = {};
+  findRegexEnabledGroup: any = {};
   regexGroup: any = {};
   regexFilterGroup: any = {};
   renameGroup: any = {};
@@ -195,9 +197,9 @@ export class AppComponent implements AfterViewChecked {
   }
 
   findAndReplace(column: string) {
-    this.response.data = [...this.response.data].map((row) => {
-      row[column] = row[column].replaceAll(this.findGroup[column].value, this.replaceGroup[column].value);
-      return row;
+    this.data.forEach((row: any) => {
+      const findValue = this.findRegexEnabledGroup[column] ? new RegExp(this.findRegexGroup[column].value) : this.findGroup[column].value;
+      row[column] = row[column].replace(findValue, this.replaceGroup[column].value);
     });
   }
 
@@ -292,6 +294,7 @@ export class AppComponent implements AfterViewChecked {
     this.keys.forEach((key: any) => {
       this.filterGroup[key] = new FormControl('');
       this.findGroup[key] = new FormControl('');
+      this.findRegexGroup[key] = new FormControl('');
       this.replaceGroup[key] = new FormControl('');
       this.renameGroup[key] = new FormControl('');
       this.reorderGroup[key] = new FormControl('');
@@ -301,6 +304,7 @@ export class AppComponent implements AfterViewChecked {
       this.reorderMenu[key] = false;
       this.regexGroup[key] = false;
       this.lockDisabled[key] = true;
+      this.findRegexEnabledGroup[key] = false;
     });
   }
 
@@ -370,5 +374,9 @@ export class AppComponent implements AfterViewChecked {
   clearFilters(column: string) {
     this.filterFormGroup.controls[column].setValue('');
     this.regexFormGroup.controls[column].setValue('');
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

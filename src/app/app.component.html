@@ -59,8 +59,12 @@
                         <div *ngIf="findMenu[disCol]">
                             <mat-form-field [style.width.%]="100">
                                 <mat-label>Find</mat-label>
-                                <input matInput type="text" [formControl]="findGroup[disCol]">
+                                <input matInput type="text" *ngIf="!findRegexEnabledGroup[disCol]" [formControl]="findGroup[disCol]">
+                                <input matInput type="text" *ngIf="findRegexEnabledGroup[disCol]" [formControl]="findRegexGroup[disCol]">
                             </mat-form-field>
+                            <div style="margin-top:-25px;" class="flex-apart">
+                                <mat-slide-toggle class="shrink-75x" (change)="clearFilters(disCol)" [(ngModel)]="findRegexEnabledGroup[disCol]">REGEX</mat-slide-toggle>
+                            </div>
                             <br>
                             <mat-form-field [style.width.%]="100">
                                 <mat-label>Replace</mat-label>
