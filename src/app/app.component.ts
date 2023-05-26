@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, QueryList, Signal, ViewChild, ViewChildren, computed, signal } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import * as Papa from 'papaparse';
 import { MatTableExporterDirective } from 'mat-table-exporter';
@@ -21,7 +21,7 @@ export class AppComponent implements AfterViewChecked, OnDestroy {
   data: any = [{}];
   hiddenColumns: any[] = [];
   keys: any[] = [];
-  hidden: boolean = true;
+  hidden = true;
   findMenu: any = {};
   renameMenu: any = {};
   reorderMenu: any = {};
@@ -38,6 +38,7 @@ export class AppComponent implements AfterViewChecked, OnDestroy {
   subscriptions: Subscription[] = [];
   filterFormGroup!: FormGroup;
   regexFormGroup!: FormGroup;
+  paginatorHidden = signal(true);
   @ViewChild(MatTableExporterDirective) matTableExporter!: MatTableExporterDirective;
   @ViewChild('paginator') paginator!: MatPaginator;
   @ViewChild('fileInput') fileInput!: ElementRef;
@@ -82,6 +83,7 @@ export class AppComponent implements AfterViewChecked, OnDestroy {
         this.createFilterSubscription();
       });
     }
+    this.paginatorHidden.set(this.response.data.length > 5);
   }
 
 
@@ -170,7 +172,7 @@ export class AppComponent implements AfterViewChecked, OnDestroy {
       this.exportFile(csv, type);
     }
     if (type == 'md') {
-      var parser = require('json-to-markdown-table');
+      const parser = require('json-to-markdown-table');
       const data = parser(nonHiddenColumns, Object.keys(nonHiddenColumns[0]));
       this.exportFile(data, type);
     }
@@ -248,12 +250,12 @@ export class AppComponent implements AfterViewChecked, OnDestroy {
     items.unshift(Object.keys(items[0]));
     // Convert Object to JSON
     const jsonObject = JSON.stringify(items);
-    var array = typeof jsonObject != 'object' ? JSON.parse(jsonObject) : jsonObject;
-    var str = '';
+    const array = typeof jsonObject != 'object' ? JSON.parse(jsonObject) : jsonObject;
+    let str = '';
 
-    for (var i = 0; i < array.length; i++) {
-      var line = '';
-      for (var index in array[i]) {
+    for (let i = 0; i < array.length; i++) {
+      let line = '';
+      for (const index in array[i]) {
         if (line != '') line += ','
 
         line += array[i][index];
