@@ -46,7 +46,7 @@
                             </mat-menu>
                         </div>
                         <div *ngIf="renameMenu[disCol]">
-                            <mat-form-field [style.width.%]="100">
+                            <mat-form-field appearance="outline" [style.width.%]="100">
                                 <mat-label>Rename</mat-label>
                                 <input matInput type="text" [formControl]="renameGroup[disCol]">
                             </mat-form-field>
@@ -57,7 +57,7 @@
                             </div>
                         </div>
                         <div *ngIf="findMenu[disCol]">
-                            <mat-form-field [style.width.%]="100">
+                            <mat-form-field appearance="outline" [style.width.%]="100">
                                 <mat-label>Find</mat-label>
                                 <input matInput type="text" *ngIf="!findRegexEnabledGroup[disCol]" [formControl]="findGroup[disCol]">
                                 <input matInput type="text" *ngIf="findRegexEnabledGroup[disCol]" [formControl]="findRegexGroup[disCol]">
@@ -66,7 +66,7 @@
                                 <mat-slide-toggle class="shrink-75x" (change)="clearFilters(disCol)" [(ngModel)]="findRegexEnabledGroup[disCol]">REGEX</mat-slide-toggle>
                             </div>
                             <br>
-                            <mat-form-field [style.width.%]="100">
+                            <mat-form-field appearance="outline" [style.width.%]="100">
                                 <mat-label>Replace</mat-label>
                                 <input matInput type="text" [formControl]="replaceGroup[disCol]">
                             </mat-form-field>
@@ -77,7 +77,7 @@
                             </div>
                         </div>
                         <div *ngIf="reorderMenu[disCol]">
-                            <mat-form-field [style.width.%]="100">
+                            <mat-form-field appearance="outline" [style.width.%]="100">
                                 <mat-label>New Index</mat-label>
                                 <input matInput type="number" [formControl]="reorderGroup[disCol]">
                             </mat-form-field>
