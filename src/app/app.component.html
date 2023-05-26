@@ -100,10 +100,8 @@
         <tr mat-row *matRowDef="let row; columns: keys"></tr>
     </table>
 </div>
-<div [hidden]="paginatorHidden()">
-    <mat-paginator [style.width.%]="100" [disabled]="response.data.length < 6" [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
-    </mat-paginator>
-</div>
+<mat-paginator [style.width.%]="100" [disabled]="response.data.length < 6" [pageSizeOptions]="[5, 10, 20,100]" [pageSize]="10" [pageIndex]="0" showFirstLastButtons #paginator>
+</mat-paginator>
 <mat-grid-list [style.width.%]="100" *ngIf="!hidden" cols="4" rowHeight="4:1">
     <!-- <mat-grid-tile>
         <button [style.width.%]="90" mat-raised-button color="primary" (click)="export('xlsx', {fileName:'export', sheet: 'sheet', Props: {Author: 'app'}})">Excel</button>
