@@ -20,7 +20,7 @@
         "@angular/platform-browser": "^16.0.0",
         "@angular/platform-browser-dynamic": "^16.0.0",
         "@angular/router": "^16.0.0",
-        "axios": "^1.4.0",
+        "axios": "^1.6.0",
         "export-from-json": "^1.7.2",
         "html-table-to-json": "^1.0.0",
         "json-to-markdown-table": "^1.0.0",
